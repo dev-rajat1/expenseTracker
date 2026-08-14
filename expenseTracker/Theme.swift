@@ -60,3 +60,20 @@ extension UIColor {
         self.init(red: r, green: g, blue: b, alpha: 1.0)
     }
 }
+
+extension UIImage {
+    static func gradientImage(bounds: CGRect, colors: [UIColor]) -> UIImage {
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.frame = bounds
+        gradientLayer.colors = colors.map(\.cgColor)
+        gradientLayer.startPoint = CGPoint(x: 0.0, y: 0.0)
+        gradientLayer.endPoint = CGPoint(x: 1.0, y: 1.0)
+        
+        UIGraphicsBeginImageContext(gradientLayer.bounds.size)
+        gradientLayer.render(in: UIGraphicsGetCurrentContext()!)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return image!
+    }
+}
+

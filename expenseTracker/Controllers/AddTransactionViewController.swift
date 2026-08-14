@@ -36,6 +36,12 @@ class AddTransactionViewController: UIViewController {
         
         typeSegment.selectedSegmentIndex = 0
         typeSegment.backgroundColor = .systemGray6
+        DispatchQueue.main.async {
+            let gradientImage = UIImage.gradientImage(bounds: self.typeSegment.bounds, colors: [UIColor.systemIndigo, UIColor.systemPurple])
+            self.typeSegment.selectedSegmentTintColor = UIColor(patternImage: gradientImage)
+            self.typeSegment.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
+            self.typeSegment.setTitleTextAttributes([.foregroundColor: UIColor.label], for: .normal)
+        }
         
         amountField.placeholder = "0.00"
         amountField.keyboardType = .decimalPad
@@ -71,13 +77,27 @@ class AddTransactionViewController: UIViewController {
         datePicker.datePickerMode = .dateAndTime
         datePicker.preferredDatePickerStyle = .compact
         
-        let vStack = UIStackView(arrangedSubviews: [typeSegment, amountField, noteField, scanBtn, catHeaderStack, categoryPicker, datePicker])
+        let saveContainer = UIButton(type: .system)
+        saveContainer.setTitle("Save Transaction", for: .normal)
+        saveContainer.setTitleColor(.white, for: .normal)
+        saveContainer.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
+        saveContainer.layer.cornerRadius = 14
+        saveContainer.clipsToBounds = true
+        DispatchQueue.main.async {
+            let btnGradient = UIImage.gradientImage(bounds: saveContainer.bounds, colors: [UIColor.systemIndigo, UIColor.systemPurple])
+            saveContainer.setBackgroundImage(btnGradient, for: .normal)
+        }
+        saveContainer.addTarget(self, action: #selector(didTapSave), for: .touchUpInside)
+        
+        let vStack = UIStackView(arrangedSubviews: [typeSegment, amountField, noteField, scanBtn, catHeaderStack, categoryPicker, datePicker, saveContainer])
         vStack.axis = .vertical
         vStack.spacing = 16
         vStack.translatesAutoresizingMaskIntoConstraints = false
         glassView.contentView.addSubview(vStack)
         
         NSLayoutConstraint.activate([
+            saveContainer.heightAnchor.constraint(equalToConstant: 50),
+            
             glassView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
             glassView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             glassView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),

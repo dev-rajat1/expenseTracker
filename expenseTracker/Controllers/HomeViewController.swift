@@ -35,12 +35,23 @@ class HomeViewController: UIViewController {
         searchBar.delegate = self
         searchBar.searchBarStyle = .minimal
         searchBar.placeholder = "Search expenses..."
+        searchBar.searchTextField.backgroundColor = .secondarySystemGroupedBackground
+        searchBar.searchTextField.layer.cornerRadius = 10
+        searchBar.searchTextField.clipsToBounds = true
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(searchBar)
         
         // 2. Filters
         segmentedControl.selectedSegmentIndex = 2
         segmentedControl.addTarget(self, action: #selector(filterChanged), for: .valueChanged)
+        
+        // Custom Segment Styling
+        DispatchQueue.main.async {
+            let gradientImage = UIImage.gradientImage(bounds: self.segmentedControl.bounds, colors: [UIColor.systemIndigo, UIColor.systemPurple])
+            self.segmentedControl.selectedSegmentTintColor = UIColor(patternImage: gradientImage)
+            self.segmentedControl.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
+            self.segmentedControl.setTitleTextAttributes([.foregroundColor: UIColor.label], for: .normal)
+        }
         segmentedControl.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(segmentedControl)
         
@@ -89,13 +100,20 @@ class HomeViewController: UIViewController {
         
         // 5. Floating Action Button (FAB)
         fab.setImage(UIImage(systemName: "plus"), for: .normal)
-        fab.backgroundColor = Theme.accent
         fab.tintColor = .white
         fab.layer.cornerRadius = 28
-        fab.layer.shadowColor = UIColor.black.cgColor
-        fab.layer.shadowOpacity = 0.3
-        fab.layer.shadowOffset = CGSize(width: 0, height: 5)
-        fab.layer.shadowRadius = 10
+        fab.clipsToBounds = true
+        
+        DispatchQueue.main.async {
+            let fabGradient = UIImage.gradientImage(bounds: self.fab.bounds, colors: [UIColor.systemPink, UIColor.systemOrange])
+            self.fab.setBackgroundImage(fabGradient, for: .normal)
+        }
+        
+        fab.layer.shadowColor = UIColor.systemPink.cgColor
+        fab.layer.shadowOpacity = 0.5
+        fab.layer.shadowOffset = CGSize(width: 0, height: 6)
+        fab.layer.shadowRadius = 12
+        fab.layer.masksToBounds = false
         fab.addTarget(self, action: #selector(didTapAdd), for: .touchUpInside)
         fab.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(fab)
