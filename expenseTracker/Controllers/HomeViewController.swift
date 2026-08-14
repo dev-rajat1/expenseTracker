@@ -31,13 +31,24 @@ class HomeViewController: UIViewController {
         title = "Home"
         navigationController?.navigationBar.prefersLargeTitles = true
         
-        // 1. Search Bar
+        // 1. Search Bar (Premium Styling)
         searchBar.delegate = self
         searchBar.searchBarStyle = .minimal
         searchBar.placeholder = "Search expenses..."
-        searchBar.searchTextField.backgroundColor = .secondarySystemGroupedBackground
-        searchBar.searchTextField.layer.cornerRadius = 10
-        searchBar.searchTextField.clipsToBounds = true
+        searchBar.backgroundImage = UIImage() // Remove default borders
+        
+        // Text field styling
+        let textField = searchBar.searchTextField
+        textField.backgroundColor = .secondarySystemGroupedBackground
+        textField.layer.cornerRadius = 18 // Pill shape
+        textField.clipsToBounds = true
+        textField.font = .systemFont(ofSize: 16, weight: .medium)
+        
+        // Icon styling
+        if let leftIcon = textField.leftView as? UIImageView {
+            leftIcon.tintColor = Theme.accent
+        }
+        
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(searchBar)
         
