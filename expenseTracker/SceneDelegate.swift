@@ -16,10 +16,12 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         
         window = UIWindow(windowScene: windowScene)
-        let dashboardVC = DashboardViewController()
-        let navController = UINavigationController(rootViewController: dashboardVC)
-        window?.rootViewController = navController
+        let tabBarController = MainTabBarController()
+        window?.rootViewController = tabBarController
         window?.makeKeyAndVisible()
+        
+        // Apply saved theme
+        ThemeManager.shared.applyTheme()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

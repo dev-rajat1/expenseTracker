@@ -32,6 +32,30 @@ enum Theme {
     }()
 }
 
+class ThemeManager {
+    static let shared = ThemeManager()
+    
+    var currentTheme: UIUserInterfaceStyle {
+        get {
+            let saved = UserDefaults.standard.integer(forKey: "appTheme")
+            return UIUserInterfaceStyle(rawValue: saved) ?? .unspecified
+        }
+        set {
+            UserDefaults.standard.set(newValue.rawValue, forKey: "appTheme")
+            applyTheme()
+        }
+    }
+    
+    func applyTheme() {
+        // Appears across all scenes
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
+            for window in windowScene.windows {
+                window.overrideUserInterfaceStyle = currentTheme
+            }
+        }
+    }
+}
+
 extension UIColor {
     convenience init(hex: String) {
         var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
