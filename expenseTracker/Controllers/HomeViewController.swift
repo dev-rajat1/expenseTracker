@@ -48,9 +48,22 @@ class HomeViewController: UIViewController {
         balanceCard.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(balanceCard)
         
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.colors = [UIColor.systemIndigo.cgColor, UIColor.systemPurple.cgColor]
+        gradientLayer.locations = [0.0, 1.0]
+        gradientLayer.cornerRadius = 24
+        gradientLayer.startPoint = CGPoint(x: 0, y: 0)
+        gradientLayer.endPoint = CGPoint(x: 1, y: 1)
+        balanceCard.contentView.layer.insertSublayer(gradientLayer, at: 0)
+        
+        // Ensure gradient resizes
+        DispatchQueue.main.async {
+            gradientLayer.frame = self.balanceCard.bounds
+        }
+        
         let balanceTitle = UILabel()
         balanceTitle.text = "Total Balance"
-        balanceTitle.textColor = .lightGray
+        balanceTitle.textColor = UIColor(white: 1.0, alpha: 0.8)
         balanceTitle.font = .systemFont(ofSize: 14, weight: .medium)
         balanceTitle.textAlignment = .center
         
@@ -69,7 +82,8 @@ class HomeViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.backgroundColor = .clear
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.separatorStyle = .none
+        tableView.register(TransactionCell.self, forCellReuseIdentifier: "cell")
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
         
@@ -192,28 +206,15 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
         return filteredTransactions.count
     }
     
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 76
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! TransactionCell
         let t = filteredTransactions[indexPath.row]
-        cell.backgroundColor = .clear
-        cell.textLabel?.textColor = .white
-        cell.detailTextLabel?.textColor = .lightGray
-        
-        let formatter = DateFormatter()
-        formatter.dateStyle = .short
-        let dateStr = t.date != nil ? formatter.string(from: t.date!) : ""
-        let catName = t.category?.name ?? "Other"
-        
-        cell.textLabel?.text = "\(catName) - \(dateStr)"
-        
-        let amountStr = Theme.currencyFormatter.string(from: NSNumber(value: t.amount)) ?? "0.00"
-        if t.type == "income" {
-            cell.detailTextLabel?.text = "+\(amountStr)"
-            cell.detailTextLabel?.textColor = Theme.incomeColor
-        } else {
-            cell.detailTextLabel?.text = "-\(amountStr)"
-            cell.detailTextLabel?.textColor = Theme.expenseColor
-        }
+        cell.configure(with: t)
+        cell.selectionStyle = .none
         return cell
     }
     

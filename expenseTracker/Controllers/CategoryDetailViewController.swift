@@ -22,7 +22,8 @@ class CategoryDetailViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.backgroundColor = .clear
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "cell")
+        tableView.separatorStyle = .none
+        tableView.register(TransactionCell.self, forCellReuseIdentifier: "cell")
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
         
@@ -55,25 +56,15 @@ extension CategoryDetailViewController: UITableViewDelegate, UITableViewDataSour
         return transactions.count
     }
     
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 76
+    }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: .value1, reuseIdentifier: "cell")
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! TransactionCell
         let t = transactions[indexPath.row]
-        cell.backgroundColor = .clear
-        cell.textLabel?.textColor = .white
-        
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        cell.textLabel?.text = t.date != nil ? formatter.string(from: t.date!) : "No Date"
-        
-        let amountStr = Theme.currencyFormatter.string(from: NSNumber(value: t.amount)) ?? "0.00"
-        if t.type == "income" {
-            cell.detailTextLabel?.text = "+\(amountStr)"
-            cell.detailTextLabel?.textColor = Theme.incomeColor
-        } else {
-            cell.detailTextLabel?.text = "-\(amountStr)"
-            cell.detailTextLabel?.textColor = Theme.expenseColor
-        }
-        
+        cell.configure(with: t)
+        cell.selectionStyle = .none
         return cell
     }
     

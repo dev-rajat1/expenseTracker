@@ -4,7 +4,7 @@ import CoreData
 class SummaryViewController: UIViewController {
     
     private let pieChartView = PieChartView()
-    private let tableView = UITableView()
+    private var collectionView: UICollectionView!
     
     private var allTransactions: [Transaction] = []
     private var categoryTotals: [(category: Category, total: Double)] = []
@@ -19,8 +19,6 @@ class SummaryViewController: UIViewController {
         fetchData()
     }
     
-
-    
     private func setupUI() {
         view.backgroundColor = .systemBackground
         title = "Summary"
@@ -29,23 +27,31 @@ class SummaryViewController: UIViewController {
         pieChartView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(pieChartView)
         
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.backgroundColor = .clear
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "catCell")
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(tableView)
+        let layout = UICollectionViewFlowLayout()
+        layout.minimumLineSpacing = 16
+        layout.minimumInteritemSpacing = 16
+        layout.sectionInset = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
+        let width = (view.bounds.width - 48) / 2
+        layout.itemSize = CGSize(width: width, height: width * 0.9)
+        
+        collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        collectionView.backgroundColor = .clear
+        collectionView.register(CategoryGridCell.self, forCellWithReuseIdentifier: "gridCell")
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(collectionView)
         
         NSLayoutConstraint.activate([
-            pieChartView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            pieChartView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
             pieChartView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             pieChartView.widthAnchor.constraint(equalToConstant: 220),
             pieChartView.heightAnchor.constraint(equalToConstant: 220),
             
-            tableView.topAnchor.constraint(equalTo: pieChartView.bottomAnchor, constant: 20),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            collectionView.topAnchor.constraint(equalTo: pieChartView.bottomAnchor, constant: 16),
+            collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
     }
     
@@ -79,31 +85,27 @@ class SummaryViewController: UIViewController {
         }
         
         pieChartView.segments = segments
-        tableView.reloadData()
+        collectionView.reloadData()
     }
 }
 
-extension SummaryViewController: UITableViewDelegate, UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+extension SummaryViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return categoryTotals.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell(style: .value1, reuseIdentifier: "catCell")
-        cell.backgroundColor = .clear
-        cell.textLabel?.textColor = .white
-        cell.detailTextLabel?.textColor = Theme.expenseColor
-        cell.accessoryType = .disclosureIndicator
-        
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "gridCell", for: indexPath) as! CategoryGridCell
         let item = categoryTotals[indexPath.row]
-        cell.textLabel?.text = item.category.name
-        cell.detailTextLabel?.text = Theme.currencyFormatter.string(from: NSNumber(value: item.total))
+        let defaultColors: [UIColor] = [.systemRed, .systemOrange, .systemYellow, .systemPink]
+        let color = item.category.colorHex != nil ? UIColor(hex: item.category.colorHex!) : defaultColors[indexPath.row % defaultColors.count]
         
+        cell.configure(category: item.category, amount: item.total, color: color)
         return cell
     }
     
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
         let selectedCat = categoryTotals[indexPath.row].category
         let detailVC = CategoryDetailViewController()
         detailVC.category = selectedCat

@@ -32,7 +32,11 @@ class ThemeManager {
         }
     }
     
+    static let themeChangedNotification = Notification.Name("themeChanged")
+    
     func applyTheme() {
+        NotificationCenter.default.post(name: ThemeManager.themeChangedNotification, object: nil)
+        
         let scenes = UIApplication.shared.connectedScenes
         for scene in scenes {
             if let windowScene = scene as? UIWindowScene {

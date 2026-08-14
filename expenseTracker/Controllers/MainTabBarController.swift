@@ -4,6 +4,8 @@ class MainTabBarController: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        NotificationCenter.default.addObserver(self, selector: #selector(updateTheme), name: ThemeManager.themeChangedNotification, object: nil)
+        
         
         let homeVC = HomeViewController()
         let homeNav = UINavigationController(rootViewController: homeVC)
@@ -23,5 +25,13 @@ class MainTabBarController: UITabBarController {
         tabBar.barTintColor = .systemBackground
         tabBar.isTranslucent = true
         tabBar.tintColor = Theme.accent
+    }
+    
+    @objc private func updateTheme() {
+        view.window?.overrideUserInterfaceStyle = ThemeManager.shared.currentTheme
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 }
