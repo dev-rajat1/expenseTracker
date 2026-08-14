@@ -65,11 +65,14 @@ class AddTransactionViewController: UIViewController {
         currencyLabel.font = .systemFont(ofSize: 42, weight: .semibold)
         currencyLabel.textColor = .label
         
+        currencyLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        
         amountField.placeholder = "0.00"
         amountField.keyboardType = .decimalPad
         amountField.font = .systemFont(ofSize: 42, weight: .semibold)
         amountField.textColor = .label
         amountField.adjustsFontSizeToFitWidth = true
+        amountField.textAlignment = .left
         
         let scanBtn = UIButton(type: .system)
         let scanIconConfig = UIImage.SymbolConfiguration(pointSize: 24, weight: .medium)
@@ -77,7 +80,10 @@ class AddTransactionViewController: UIViewController {
         scanBtn.tintColor = .secondaryLabel
         scanBtn.addTarget(self, action: #selector(didTapScan), for: .touchUpInside)
         
-        let amountStack = UIStackView(arrangedSubviews: [currencyLabel, amountField, scanBtn])
+        let spacer = UIView()
+        spacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        
+        let amountStack = UIStackView(arrangedSubviews: [currencyLabel, amountField, spacer, scanBtn])
         amountStack.axis = .horizontal
         amountStack.spacing = 12
         amountStack.translatesAutoresizingMaskIntoConstraints = false
@@ -148,7 +154,7 @@ class AddTransactionViewController: UIViewController {
         saveContainer.setTitle("Save Transaction", for: .normal)
         saveContainer.setTitleColor(.white, for: .normal)
         saveContainer.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
-        saveContainer.layer.cornerRadius = 28 // Perfectly round pill
+        saveContainer.layer.cornerRadius = 30 // Extra chunky and round
         saveContainer.clipsToBounds = true
         DispatchQueue.main.async {
             let btnGradient = UIImage.gradientImage(bounds: saveContainer.bounds, colors: [UIColor.systemIndigo, UIColor.systemPurple])
@@ -165,6 +171,7 @@ class AddTransactionViewController: UIViewController {
         let mainStack = UIStackView(arrangedSubviews: [typeSegment, amountCard, noteCard, categoryCard, dateCard, saveContainer])
         mainStack.axis = .vertical
         mainStack.spacing = 20
+        mainStack.setCustomSpacing(40, after: dateCard) // Extra space before Save button
         mainStack.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(mainStack)
         
@@ -175,7 +182,7 @@ class AddTransactionViewController: UIViewController {
             mainStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -40),
             
             typeSegment.heightAnchor.constraint(equalToConstant: 44),
-            saveContainer.heightAnchor.constraint(equalToConstant: 56),
+            saveContainer.heightAnchor.constraint(equalToConstant: 60),
             categoryPicker.heightAnchor.constraint(equalToConstant: 120),
             scanBtn.widthAnchor.constraint(equalToConstant: 44),
             
