@@ -23,7 +23,9 @@ class MainTabBarController: UITabBarController {
         let appearance = UITabBarAppearance()
         appearance.configureWithDefaultBackground()
         tabBar.standardAppearance = appearance
-        tabBar.scrollEdgeAppearance = appearance
+        if #available(iOS 15.0, *) {
+            tabBar.scrollEdgeAppearance = appearance
+        }
         tabBar.tintColor = Theme.accent
     }
 }
