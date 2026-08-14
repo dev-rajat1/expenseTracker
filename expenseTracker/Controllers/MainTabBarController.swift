@@ -19,13 +19,9 @@ class MainTabBarController: UITabBarController {
         
         viewControllers = [homeNav, summaryNav, settingsNav]
         
-        // Tab Bar Styling
-        let appearance = UITabBarAppearance()
-        appearance.configureWithDefaultBackground()
-        tabBar.standardAppearance = appearance
-        if #available(iOS 15.0, *) {
-            tabBar.scrollEdgeAppearance = appearance
-        }
+        // Tab Bar Styling (Backward Compatible)
+        tabBar.barTintColor = .systemBackground
+        tabBar.isTranslucent = true
         tabBar.tintColor = Theme.accent
     }
 }
