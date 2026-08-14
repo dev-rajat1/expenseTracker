@@ -13,13 +13,6 @@ A premium, modern iOS application for tracking personal finances, built purely p
 - **Data Export**: Export your transaction data to Excel (CSV) or beautiful PDF reports with one tap.
 - **Haptic Feedback**: Rich tactile interactions throughout the app using `UIImpactFeedbackGenerator`.
 
-## 📸 Screenshots
-*(Add screenshots here)*
-- **Home Screen:** Clean transaction list with grouped headers.
-- **Add Transaction:** Modern form layout with OCR Scan button.
-- **Analytics:** Animated Pie Chart with horizontal category scrolling.
-- **Settings:** Premium `.insetGrouped` UI with custom icons.
-
 ## 🛠 Tech Stack
 
 - **Platform:** iOS 14.0+ (Swift 5)
