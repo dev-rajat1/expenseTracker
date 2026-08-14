@@ -24,10 +24,7 @@ class HomeViewController: UIViewController {
         fetchData()
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        Theme.applyDarkBackgroundGradient(to: view)
-    }
+
     
     private func setupUI() {
         view.backgroundColor = .systemBackground
@@ -222,5 +219,11 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        let t = filteredTransactions[indexPath.row]
+        let noteText = (t.note != nil && !t.note!.isEmpty) ? t.note! : "No note provided."
+        
+        let alert = UIAlertController(title: "Transaction Note", message: noteText, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 }

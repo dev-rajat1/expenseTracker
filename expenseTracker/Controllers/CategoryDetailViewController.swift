@@ -13,10 +13,7 @@ class CategoryDetailViewController: UIViewController {
         fetchTransactions()
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        Theme.applyDarkBackgroundGradient(to: view)
-    }
+
     
     private func setupUI() {
         view.backgroundColor = .systemBackground
@@ -78,5 +75,15 @@ extension CategoryDetailViewController: UITableViewDelegate, UITableViewDataSour
         }
         
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let t = transactions[indexPath.row]
+        let noteText = (t.note != nil && !t.note!.isEmpty) ? t.note! : "No note provided."
+        
+        let alert = UIAlertController(title: "Transaction Note", message: noteText, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
     }
 }

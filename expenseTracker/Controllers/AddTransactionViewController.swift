@@ -6,6 +6,7 @@ class AddTransactionViewController: UIViewController {
 
     private let typeSegment = UISegmentedControl(items: ["Expense", "Income"])
     private let amountField = UITextField()
+    private let noteField = UITextField()
     private let categoryPicker = UIPickerView()
     private let datePicker = UIDatePicker()
     
@@ -17,18 +18,13 @@ class AddTransactionViewController: UIViewController {
         fetchCategories()
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        Theme.applyDarkBackgroundGradient(to: view)
-    }
-    
     private func setupUI() {
         view.backgroundColor = .systemBackground
         title = "Add Transaction"
         
         let cancelBtn = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(didTapCancel))
         let saveBtn = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(didTapSave))
-        cancelBtn.tintColor = .white
+        cancelBtn.tintColor = .systemRed
         saveBtn.tintColor = Theme.accent
         
         navigationItem.leftBarButtonItem = cancelBtn
@@ -45,7 +41,10 @@ class AddTransactionViewController: UIViewController {
         amountField.keyboardType = .decimalPad
         amountField.font = .systemFont(ofSize: 32, weight: .bold)
         amountField.textAlignment = .center
-        amountField.textColor = .white
+        
+        noteField.placeholder = "Add a note..."
+        noteField.borderStyle = .roundedRect
+        noteField.backgroundColor = .secondarySystemBackground
         
         let scanBtn = UIButton(type: .system)
         scanBtn.setImage(UIImage(systemName: "camera.viewfinder"), for: .normal)
@@ -53,20 +52,33 @@ class AddTransactionViewController: UIViewController {
         scanBtn.tintColor = Theme.accent
         scanBtn.addTarget(self, action: #selector(didTapScan), for: .touchUpInside)
         
+        let catLabel = UILabel()
+        catLabel.text = "Category"
+        catLabel.font = .systemFont(ofSize: 14, weight: .semibold)
+        catLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        
+        let newCatBtn = UIButton(type: .system)
+        newCatBtn.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
+        newCatBtn.setTitle(" New", for: .normal)
+        newCatBtn.addTarget(self, action: #selector(didTapNewCategory), for: .touchUpInside)
+        
+        let catHeaderStack = UIStackView(arrangedSubviews: [catLabel, UIView(), newCatBtn])
+        catHeaderStack.axis = .horizontal
+        
         categoryPicker.delegate = self
         categoryPicker.dataSource = self
         
-        datePicker.datePickerMode = .date
+        datePicker.datePickerMode = .dateAndTime
         datePicker.preferredDatePickerStyle = .compact
         
-        let vStack = UIStackView(arrangedSubviews: [typeSegment, amountField, scanBtn, categoryPicker, datePicker])
+        let vStack = UIStackView(arrangedSubviews: [typeSegment, amountField, noteField, scanBtn, catHeaderStack, categoryPicker, datePicker])
         vStack.axis = .vertical
-        vStack.spacing = 20
+        vStack.spacing = 16
         vStack.translatesAutoresizingMaskIntoConstraints = false
         glassView.contentView.addSubview(vStack)
         
         NSLayoutConstraint.activate([
-            glassView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            glassView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
             glassView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             glassView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             glassView.bottomAnchor.constraint(equalTo: vStack.bottomAnchor, constant: 20),
@@ -77,6 +89,15 @@ class AddTransactionViewController: UIViewController {
             
             categoryPicker.heightAnchor.constraint(equalToConstant: 100)
         ])
+        
+        // Tap to dismiss keyboard
+        let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
+    }
+    
+    @objc private func dismissKeyboard() {
+        view.endEditing(true)
     }
     
     private func fetchCategories() {
@@ -85,6 +106,30 @@ class AddTransactionViewController: UIViewController {
             categories = try CoreDataManager.shared.context.fetch(req)
             categoryPicker.reloadAllComponents()
         } catch {}
+    }
+    
+    @objc private func didTapNewCategory() {
+        let alert = UIAlertController(title: "New Category", message: "Enter a name for the new category.", preferredStyle: .alert)
+        alert.addTextField { tf in
+            tf.placeholder = "Category Name"
+        }
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Save", style: .default) { [weak self] _ in
+            guard let text = alert.textFields?.first?.text, !text.isEmpty else { return }
+            let context = CoreDataManager.shared.context
+            let cat = Category(context: context)
+            cat.name = text
+            cat.colorHex = "#3498db" // Default color for custom
+            cat.budgetLimit = 0
+            CoreDataManager.shared.saveContext()
+            self?.fetchCategories()
+            
+            // Select the newly added category
+            if let index = self?.categories.firstIndex(of: cat) {
+                self?.categoryPicker.selectRow(index, inComponent: 0, animated: true)
+            }
+        })
+        present(alert, animated: true)
     }
     
     @objc private func didTapScan() {
@@ -108,6 +153,7 @@ class AddTransactionViewController: UIViewController {
         let newTrans = Transaction(context: context)
         newTrans.id = UUID()
         newTrans.amount = amount
+        newTrans.note = noteField.text
         newTrans.date = datePicker.date
         newTrans.type = typeSegment.selectedSegmentIndex == 0 ? "expense" : "income"
         if !categories.isEmpty {
@@ -121,8 +167,8 @@ class AddTransactionViewController: UIViewController {
 extension AddTransactionViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     func numberOfComponents(in pickerView: UIPickerView) -> Int { return 1 }
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int { return categories.count }
-    func pickerView(_ pickerView: UIPickerView, attributedTitleForRow row: Int, forComponent component: Int) -> NSAttributedString? {
-        return NSAttributedString(string: categories[row].name ?? "", attributes: [NSAttributedString.Key.foregroundColor: UIColor.white])
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return categories[row].name
     }
 }
 

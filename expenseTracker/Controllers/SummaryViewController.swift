@@ -19,10 +19,7 @@ class SummaryViewController: UIViewController {
         fetchData()
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        Theme.applyDarkBackgroundGradient(to: view)
-    }
+
     
     private func setupUI() {
         view.backgroundColor = .systemBackground

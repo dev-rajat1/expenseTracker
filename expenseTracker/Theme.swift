@@ -10,20 +10,6 @@ enum Theme {
     static let incomeColor = UIColor.systemGreen
     static let expenseColor = UIColor.systemRed
     
-    static func applyDarkBackgroundGradient(to view: UIView) {
-        let gradientLayer = CAGradientLayer()
-        gradientLayer.colors = [
-            UIColor(red: 25/255, green: 25/255, blue: 35/255, alpha: 1.0).cgColor,
-            UIColor(red: 15/255, green: 15/255, blue: 25/255, alpha: 1.0).cgColor
-        ]
-        gradientLayer.locations = [0.0, 1.0]
-        gradientLayer.frame = view.bounds
-        if let oldGradient = view.layer.sublayers?.first(where: { $0 is CAGradientLayer }) {
-            oldGradient.removeFromSuperlayer()
-        }
-        view.layer.insertSublayer(gradientLayer, at: 0)
-    }
-    
     static let currencyFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
@@ -47,10 +33,12 @@ class ThemeManager {
     }
     
     func applyTheme() {
-        // Appears across all scenes
-        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
-            for window in windowScene.windows {
-                window.overrideUserInterfaceStyle = currentTheme
+        let scenes = UIApplication.shared.connectedScenes
+        for scene in scenes {
+            if let windowScene = scene as? UIWindowScene {
+                for window in windowScene.windows {
+                    window.overrideUserInterfaceStyle = currentTheme
+                }
             }
         }
     }
