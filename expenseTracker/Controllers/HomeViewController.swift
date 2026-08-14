@@ -27,7 +27,7 @@ class HomeViewController: UIViewController {
 
     
     private func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGroupedBackground
         title = "Home"
         navigationController?.navigationBar.prefersLargeTitles = true
         

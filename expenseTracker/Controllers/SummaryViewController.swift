@@ -28,7 +28,7 @@ class SummaryViewController: UIViewController {
     }
     
     private func setupUI() {
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .systemGroupedBackground
         title = "Analytics"
         navigationController?.navigationBar.prefersLargeTitles = true
         
