@@ -91,5 +91,22 @@ extension String {
         if lower.contains("grocer") { return "cart.fill" }
         return "tag.fill"
     }
+    
+    func colorForCategory() -> UIColor {
+        let lower = self.lowercased()
+        if lower.contains("food") || lower.contains("dine") || lower.contains("eat") { return .systemOrange }
+        if lower.contains("travel") || lower.contains("transport") || lower.contains("cab") { return .systemBlue }
+        if lower.contains("shop") || lower.contains("clothes") { return .systemPurple }
+        if lower.contains("health") || lower.contains("med") || lower.contains("doctor") { return .systemRed }
+        if lower.contains("gym") || lower.contains("fit") { return .systemTeal }
+        if lower.contains("bill") || lower.contains("util") { return .systemYellow }
+        if lower.contains("edu") || lower.contains("school") || lower.contains("study") { return .systemIndigo }
+        if lower.contains("enter") || lower.contains("movie") || lower.contains("fun") { return .systemPink }
+        if lower.contains("grocer") { return .systemGreen }
+        
+        let hash = abs(self.hashValue)
+        let colors: [UIColor] = [.systemRed, .systemOrange, .systemYellow, .systemGreen, .systemBlue, .systemPurple, .systemTeal, .systemIndigo, .systemPink]
+        return colors[hash % colors.count]
+    }
 }
 

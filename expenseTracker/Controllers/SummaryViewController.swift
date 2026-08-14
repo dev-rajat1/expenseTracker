@@ -154,11 +154,10 @@ class SummaryViewController: UIViewController {
         categoryTotals = totalsDict.map { (category: $0.key, total: $0.value) }.sorted(by: { $0.total > $1.total })
         
         var segments: [PieChartSegment] = []
-        let defaultColors: [UIColor] = [.systemRed, .systemOrange, .systemYellow, .systemPink]
-        
-        for (idx, item) in categoryTotals.enumerated() {
-            let color = item.category.colorHex != nil ? UIColor(hex: item.category.colorHex!) : defaultColors[idx % defaultColors.count]
-            segments.append(PieChartSegment(color: color, value: item.total, title: item.category.name ?? ""))
+        for item in categoryTotals {
+            let catName = item.category.name ?? ""
+            let color = catName.colorForCategory()
+            segments.append(PieChartSegment(color: color, value: item.total, title: catName))
         }
         
         pieChartView.segments = segments
@@ -174,8 +173,8 @@ extension SummaryViewController: UICollectionViewDelegate, UICollectionViewDataS
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "gridCell", for: indexPath) as! CategoryGridCell
         let item = categoryTotals[indexPath.row]
-        let defaultColors: [UIColor] = [.systemRed, .systemOrange, .systemYellow, .systemPink]
-        let color = item.category.colorHex != nil ? UIColor(hex: item.category.colorHex!) : defaultColors[indexPath.row % defaultColors.count]
+        let catName = item.category.name ?? ""
+        let color = catName.colorForCategory()
         
         cell.configure(category: item.category, amount: item.total, color: color)
         return cell

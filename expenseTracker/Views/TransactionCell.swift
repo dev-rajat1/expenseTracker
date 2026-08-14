@@ -91,7 +91,7 @@ class TransactionCell: UITableViewCell {
         } else {
             amountLabel.text = "-\(amountStr)"
             amountLabel.textColor = .systemRed
-            iconContainer.backgroundColor = transaction.category?.colorHex != nil ? UIColor(hex: transaction.category!.colorHex!) : Theme.accent
+            iconContainer.backgroundColor = catName.colorForCategory()
             iconImageView.image = UIImage(systemName: catName.iconForCategory())
         }
     }
