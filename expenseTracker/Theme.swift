@@ -13,7 +13,7 @@ enum Theme {
     static let currencyFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
-        formatter.locale = Locale.current // Automatically uses the user's local currency symbol
+        formatter.locale = Locale(identifier: "en_IN") // Set to Indian Rupee (₹)
         return formatter
     }()
 }

@@ -61,7 +61,7 @@ class AddTransactionViewController: UIViewController {
         let amountCard = createCardView()
         
         let currencyLabel = UILabel()
-        currencyLabel.text = "$" // Could use Locale currency symbol
+        currencyLabel.text = "₹" // Use Rupee symbol
         currencyLabel.font = .systemFont(ofSize: 40, weight: .bold)
         currencyLabel.textColor = Theme.accent
         
