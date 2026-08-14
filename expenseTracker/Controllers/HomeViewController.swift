@@ -56,13 +56,15 @@ class HomeViewController: UIViewController {
         segmentedControl.selectedSegmentIndex = 2
         segmentedControl.addTarget(self, action: #selector(filterChanged), for: .valueChanged)
         
-        // Custom Segment Styling
-        DispatchQueue.main.async {
-            let gradientImage = UIImage.gradientImage(bounds: self.segmentedControl.bounds, colors: [UIColor.systemIndigo, UIColor.systemPurple])
-            self.segmentedControl.selectedSegmentTintColor = UIColor(patternImage: gradientImage)
-            self.segmentedControl.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
-            self.segmentedControl.setTitleTextAttributes([.foregroundColor: UIColor.label], for: .normal)
-        }
+        // Custom Segment Styling (Premium Pill)
+        segmentedControl.backgroundColor = .secondarySystemGroupedBackground
+        let segFont = UIFont.systemFont(ofSize: 15, weight: .bold)
+        segmentedControl.setTitleTextAttributes([.font: segFont, .foregroundColor: UIColor.secondaryLabel], for: .normal)
+        segmentedControl.setTitleTextAttributes([.font: segFont, .foregroundColor: UIColor.white], for: .selected)
+        
+        let gradImage = UIImage.gradientImage(bounds: CGRect(x: 0, y: 0, width: 200, height: 50), colors: [UIColor.systemIndigo, UIColor.systemPurple])
+        segmentedControl.selectedSegmentTintColor = UIColor(patternImage: gradImage)
+        
         segmentedControl.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(segmentedControl)
         
@@ -135,11 +137,12 @@ class HomeViewController: UIViewController {
             searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 8),
             searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -8),
             
-            segmentedControl.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 8),
+            segmentedControl.topAnchor.constraint(equalTo: searchBar.bottomAnchor, constant: 16),
             segmentedControl.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             segmentedControl.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            segmentedControl.heightAnchor.constraint(equalToConstant: 44),
             
-            balanceCard.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 16),
+            balanceCard.topAnchor.constraint(equalTo: segmentedControl.bottomAnchor, constant: 20),
             balanceCard.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             balanceCard.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
             balanceCard.heightAnchor.constraint(equalToConstant: 100),

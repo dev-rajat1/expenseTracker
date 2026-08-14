@@ -35,13 +35,13 @@ class AddTransactionViewController: UIViewController {
         view.addSubview(glassView)
         
         typeSegment.selectedSegmentIndex = 0
-        typeSegment.backgroundColor = .systemGray6
-        DispatchQueue.main.async {
-            let gradientImage = UIImage.gradientImage(bounds: self.typeSegment.bounds, colors: [UIColor.systemIndigo, UIColor.systemPurple])
-            self.typeSegment.selectedSegmentTintColor = UIColor(patternImage: gradientImage)
-            self.typeSegment.setTitleTextAttributes([.foregroundColor: UIColor.white], for: .selected)
-            self.typeSegment.setTitleTextAttributes([.foregroundColor: UIColor.label], for: .normal)
-        }
+        typeSegment.backgroundColor = .secondarySystemGroupedBackground
+        let segFont = UIFont.systemFont(ofSize: 15, weight: .bold)
+        typeSegment.setTitleTextAttributes([.font: segFont, .foregroundColor: UIColor.secondaryLabel], for: .normal)
+        typeSegment.setTitleTextAttributes([.font: segFont, .foregroundColor: UIColor.white], for: .selected)
+        
+        let gradImage = UIImage.gradientImage(bounds: CGRect(x: 0, y: 0, width: 200, height: 50), colors: [UIColor.systemIndigo, UIColor.systemPurple])
+        typeSegment.selectedSegmentTintColor = UIColor(patternImage: gradImage)
         
         amountField.placeholder = "0.00"
         amountField.keyboardType = .decimalPad
@@ -96,6 +96,7 @@ class AddTransactionViewController: UIViewController {
         glassView.contentView.addSubview(vStack)
         
         NSLayoutConstraint.activate([
+            typeSegment.heightAnchor.constraint(equalToConstant: 44),
             saveContainer.heightAnchor.constraint(equalToConstant: 50),
             
             glassView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
