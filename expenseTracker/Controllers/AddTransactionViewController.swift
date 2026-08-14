@@ -143,8 +143,12 @@ class AddTransactionViewController: UIViewController {
         datePicker.datePickerMode = .dateAndTime
         datePicker.preferredDatePickerStyle = .compact
         
-        let dateStack = UIStackView(arrangedSubviews: [dateLabel, UIView(), datePicker])
+        let dateStackSpacer = UIView()
+        dateStackSpacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        
+        let dateStack = UIStackView(arrangedSubviews: [dateLabel, datePicker, dateStackSpacer])
         dateStack.axis = .horizontal
+        dateStack.spacing = 16
         dateStack.alignment = .center
         dateStack.translatesAutoresizingMaskIntoConstraints = false
         dateCard.addSubview(dateStack)
