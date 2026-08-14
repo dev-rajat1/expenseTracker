@@ -3,11 +3,18 @@ import CoreData
 
 class SummaryViewController: UIViewController {
     
+    private let chartCard = GlassView()
+    private let cardTitleLabel = UILabel()
     private let pieChartView = PieChartView()
+    private let centerTotalLabel = UILabel()
+    private let centerSubtitleLabel = UILabel()
+    
+    private let sectionHeaderLabel = UILabel()
     private var collectionView: UICollectionView!
     
     private var allTransactions: [Transaction] = []
     private var categoryTotals: [(category: Category, total: Double)] = []
+    private var totalExpense: Double = 0.0
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,18 +28,51 @@ class SummaryViewController: UIViewController {
     
     private func setupUI() {
         view.backgroundColor = .systemBackground
-        title = "Summary"
+        title = "Analytics"
         navigationController?.navigationBar.prefersLargeTitles = true
         
-        pieChartView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(pieChartView)
+        // 1. Chart Card
+        chartCard.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(chartCard)
         
+        cardTitleLabel.text = "Expense Breakdown"
+        cardTitleLabel.font = .systemFont(ofSize: 16, weight: .semibold)
+        cardTitleLabel.textColor = .label
+        cardTitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        chartCard.contentView.addSubview(cardTitleLabel)
+        
+        pieChartView.translatesAutoresizingMaskIntoConstraints = false
+        chartCard.contentView.addSubview(pieChartView)
+        
+        // Center labels for Donut Chart
+        centerTotalLabel.font = .systemFont(ofSize: 22, weight: .bold)
+        centerTotalLabel.textColor = .label
+        centerTotalLabel.textAlignment = .center
+        centerTotalLabel.adjustsFontSizeToFitWidth = true
+        centerTotalLabel.translatesAutoresizingMaskIntoConstraints = false
+        pieChartView.addSubview(centerTotalLabel)
+        
+        centerSubtitleLabel.text = "Total Spent"
+        centerSubtitleLabel.font = .systemFont(ofSize: 10, weight: .medium)
+        centerSubtitleLabel.textColor = .secondaryLabel
+        centerSubtitleLabel.textAlignment = .center
+        centerSubtitleLabel.translatesAutoresizingMaskIntoConstraints = false
+        pieChartView.addSubview(centerSubtitleLabel)
+        
+        // 2. Section Header
+        sectionHeaderLabel.text = "Top Categories"
+        sectionHeaderLabel.font = .systemFont(ofSize: 20, weight: .bold)
+        sectionHeaderLabel.textColor = .label
+        sectionHeaderLabel.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(sectionHeaderLabel)
+        
+        // 3. Collection View
         let layout = UICollectionViewFlowLayout()
         layout.minimumLineSpacing = 16
         layout.minimumInteritemSpacing = 16
-        layout.sectionInset = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
+        layout.sectionInset = UIEdgeInsets(top: 8, left: 16, bottom: 16, right: 16)
         let width = (view.bounds.width - 48) / 2
-        layout.itemSize = CGSize(width: width, height: width * 0.9)
+        layout.itemSize = CGSize(width: width, height: width * 0.85)
         
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.delegate = self
@@ -43,12 +83,30 @@ class SummaryViewController: UIViewController {
         view.addSubview(collectionView)
         
         NSLayoutConstraint.activate([
-            pieChartView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            pieChartView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            pieChartView.widthAnchor.constraint(equalToConstant: 220),
-            pieChartView.heightAnchor.constraint(equalToConstant: 220),
+            chartCard.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
+            chartCard.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            chartCard.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            chartCard.heightAnchor.constraint(equalToConstant: 280),
             
-            collectionView.topAnchor.constraint(equalTo: pieChartView.bottomAnchor, constant: 16),
+            cardTitleLabel.topAnchor.constraint(equalTo: chartCard.contentView.topAnchor, constant: 16),
+            cardTitleLabel.leadingAnchor.constraint(equalTo: chartCard.contentView.leadingAnchor, constant: 16),
+            
+            pieChartView.topAnchor.constraint(equalTo: cardTitleLabel.bottomAnchor, constant: 16),
+            pieChartView.centerXAnchor.constraint(equalTo: chartCard.contentView.centerXAnchor),
+            pieChartView.widthAnchor.constraint(equalToConstant: 200),
+            pieChartView.heightAnchor.constraint(equalToConstant: 200),
+            
+            centerTotalLabel.centerXAnchor.constraint(equalTo: pieChartView.centerXAnchor),
+            centerTotalLabel.centerYAnchor.constraint(equalTo: pieChartView.centerYAnchor, constant: -6),
+            centerTotalLabel.widthAnchor.constraint(equalToConstant: 100),
+            
+            centerSubtitleLabel.centerXAnchor.constraint(equalTo: pieChartView.centerXAnchor),
+            centerSubtitleLabel.topAnchor.constraint(equalTo: centerTotalLabel.bottomAnchor, constant: 2),
+            
+            sectionHeaderLabel.topAnchor.constraint(equalTo: chartCard.bottomAnchor, constant: 24),
+            sectionHeaderLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+            
+            collectionView.topAnchor.constraint(equalTo: sectionHeaderLabel.bottomAnchor, constant: 8),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
@@ -67,13 +125,16 @@ class SummaryViewController: UIViewController {
     
     private func calculateSummary() {
         var totalsDict: [Category: Double] = [:]
+        totalExpense = 0.0
         
         for t in allTransactions where t.type == "expense" {
+            totalExpense += t.amount
             if let cat = t.category {
                 totalsDict[cat, default: 0.0] += t.amount
             }
         }
         
+        centerTotalLabel.text = Theme.currencyFormatter.string(from: NSNumber(value: totalExpense))
         categoryTotals = totalsDict.map { (category: $0.key, total: $0.value) }.sorted(by: { $0.total > $1.total })
         
         var segments: [PieChartSegment] = []
