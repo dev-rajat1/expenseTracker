@@ -114,7 +114,7 @@ class HomeViewController: UIViewController {
         // 5. Floating Action Button (FAB)
         fab.setImage(UIImage(systemName: "plus"), for: .normal)
         fab.tintColor = .white
-        fab.layer.cornerRadius = 20 // Squircle instead of perfect circle
+        fab.layer.cornerRadius = 28 // Perfectly round circle
         fab.clipsToBounds = true
         
         DispatchQueue.main.async {

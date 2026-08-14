@@ -124,26 +124,14 @@ class CoreDataManager {
         do {
             let count = try context.count(for: request)
             if count == 0 {
-                let cat1 = Category(context: context)
-                cat1.id = UUID()
-                cat1.name = "Food"
-                cat1.colorHex = "#FF5733"
-                cat1.iconName = "fork.knife"
-                cat1.budgetLimit = 500.0
+                let defaultNames = ["Food", "Travel", "Shopping", "Health", "Bills", "Groceries", "Entertainment", "Salary"]
                 
-                let cat2 = Category(context: context)
-                cat2.id = UUID()
-                cat2.name = "Transport"
-                cat2.colorHex = "#3357FF"
-                cat2.iconName = "car.fill"
-                cat2.budgetLimit = 300.0
-                
-                let cat3 = Category(context: context)
-                cat3.id = UUID()
-                cat3.name = "Salary"
-                cat3.colorHex = "#33FF57"
-                cat3.iconName = "dollarsign.circle.fill"
-                cat3.budgetLimit = 0.0 // Income doesn't strictly need a limit
+                for name in defaultNames {
+                    let cat = Category(context: context)
+                    cat.id = UUID()
+                    cat.name = name
+                    cat.budgetLimit = 1000.0 // Default budget
+                }
                 
                 saveContext()
             }

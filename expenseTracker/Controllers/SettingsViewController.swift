@@ -10,7 +10,26 @@ class SettingsViewController: UITableViewController {
         ["Clear All Data"]
     ]
     
+    private let menuIcons = [
+        ["moon.fill"],
+        ["tablecells.fill", "doc.richtext.fill"],
+        ["trash.fill"]
+    ]
+    private let menuColors: [[UIColor]] = [
+        [.systemIndigo],
+        [.systemGreen, .systemBlue],
+        [.systemRed]
+    ]
+    
     private let themeSwitch = UISwitch()
+    
+    init() {
+        super.init(style: .insetGrouped)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,6 +58,25 @@ class SettingsViewController: UITableViewController {
         cell.textLabel?.text = menuItems[indexPath.section][indexPath.row]
         cell.accessoryView = nil
         cell.textLabel?.textColor = .label
+        
+        // Generate Premium Apple-style Settings Icon
+        let iconName = menuIcons[indexPath.section][indexPath.row]
+        let color = menuColors[indexPath.section][indexPath.row]
+        
+        let container = UIView(frame: CGRect(x: 0, y: 0, width: 32, height: 32))
+        container.layer.cornerRadius = 8
+        container.backgroundColor = color
+        
+        let imgView = UIImageView(frame: CGRect(x: 6, y: 6, width: 20, height: 20))
+        imgView.image = UIImage(systemName: iconName)
+        imgView.tintColor = .white
+        imgView.contentMode = .scaleAspectFit
+        container.addSubview(imgView)
+        
+        let renderer = UIGraphicsImageRenderer(size: container.bounds.size)
+        cell.imageView?.image = renderer.image { ctx in
+            container.layer.render(in: ctx.cgContext)
+        }
         
         if indexPath.section == 0 { // Theme
             cell.accessoryView = themeSwitch

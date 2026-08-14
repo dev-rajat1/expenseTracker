@@ -142,7 +142,7 @@ class AddTransactionViewController: UIViewController {
         saveContainer.setTitle("Save Transaction", for: .normal)
         saveContainer.setTitleColor(.white, for: .normal)
         saveContainer.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
-        saveContainer.layer.cornerRadius = 16
+        saveContainer.layer.cornerRadius = 28 // Perfectly round pill
         saveContainer.clipsToBounds = true
         DispatchQueue.main.async {
             let btnGradient = UIImage.gradientImage(bounds: saveContainer.bounds, colors: [UIColor.systemIndigo, UIColor.systemPurple])
