@@ -61,18 +61,20 @@ class AddTransactionViewController: UIViewController {
         let amountCard = createCardView()
         
         let currencyLabel = UILabel()
-        currencyLabel.text = "₹" // Use Rupee symbol
-        currencyLabel.font = .systemFont(ofSize: 40, weight: .bold)
-        currencyLabel.textColor = Theme.accent
+        currencyLabel.text = "₹"
+        currencyLabel.font = .systemFont(ofSize: 42, weight: .semibold)
+        currencyLabel.textColor = .label
         
         amountField.placeholder = "0.00"
         amountField.keyboardType = .decimalPad
-        amountField.font = .systemFont(ofSize: 40, weight: .bold)
+        amountField.font = .systemFont(ofSize: 42, weight: .semibold)
+        amountField.textColor = .label
         amountField.adjustsFontSizeToFitWidth = true
         
         let scanBtn = UIButton(type: .system)
-        scanBtn.setImage(UIImage(systemName: "camera.viewfinder"), for: .normal)
-        scanBtn.tintColor = Theme.accent
+        let scanIconConfig = UIImage.SymbolConfiguration(pointSize: 24, weight: .medium)
+        scanBtn.setImage(UIImage(systemName: "camera.viewfinder", withConfiguration: scanIconConfig), for: .normal)
+        scanBtn.tintColor = .secondaryLabel
         scanBtn.addTarget(self, action: #selector(didTapScan), for: .touchUpInside)
         
         let amountStack = UIStackView(arrangedSubviews: [currencyLabel, amountField, scanBtn])
@@ -83,13 +85,14 @@ class AddTransactionViewController: UIViewController {
         
         // 3. Note Card
         let noteCard = createCardView()
-        let noteIcon = UIImageView(image: UIImage(systemName: "pencil.and.outline"))
-        noteIcon.tintColor = .secondaryLabel
+        let noteIcon = UIImageView(image: UIImage(systemName: "pencil"))
+        noteIcon.tintColor = .tertiaryLabel
+        noteIcon.contentMode = .scaleAspectFit
         noteIcon.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         
         noteField.placeholder = "Add a note..."
         noteField.borderStyle = .none
-        noteField.font = .systemFont(ofSize: 16)
+        noteField.font = .systemFont(ofSize: 17, weight: .regular)
         
         let noteStack = UIStackView(arrangedSubviews: [noteIcon, noteField])
         noteStack.axis = .horizontal
@@ -101,13 +104,15 @@ class AddTransactionViewController: UIViewController {
         let categoryCard = createCardView()
         let catLabel = UILabel()
         catLabel.text = "Category"
-        catLabel.font = .systemFont(ofSize: 16, weight: .semibold)
+        catLabel.font = .systemFont(ofSize: 16, weight: .medium)
+        catLabel.textColor = .secondaryLabel
         
         let newCatBtn = UIButton(type: .system)
-        newCatBtn.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
+        let plusIcon = UIImage.SymbolConfiguration(pointSize: 14, weight: .bold)
+        newCatBtn.setImage(UIImage(systemName: "plus", withConfiguration: plusIcon), for: .normal)
         newCatBtn.setTitle(" New", for: .normal)
-        newCatBtn.tintColor = Theme.accent
-        newCatBtn.titleLabel?.font = .systemFont(ofSize: 14, weight: .bold)
+        newCatBtn.tintColor = .label
+        newCatBtn.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
         newCatBtn.addTarget(self, action: #selector(didTapNewCategory), for: .touchUpInside)
         
         let catHeaderStack = UIStackView(arrangedSubviews: [catLabel, UIView(), newCatBtn])
@@ -126,7 +131,8 @@ class AddTransactionViewController: UIViewController {
         let dateCard = createCardView()
         let dateLabel = UILabel()
         dateLabel.text = "Date & Time"
-        dateLabel.font = .systemFont(ofSize: 16, weight: .semibold)
+        dateLabel.font = .systemFont(ofSize: 16, weight: .medium)
+        dateLabel.textColor = .secondaryLabel
         
         datePicker.datePickerMode = .dateAndTime
         datePicker.preferredDatePickerStyle = .compact
