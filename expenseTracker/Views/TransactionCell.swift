@@ -74,7 +74,8 @@ class TransactionCell: UITableViewCell {
     }
     
     func configure(with transaction: Transaction) {
-        titleLabel.text = transaction.category?.name ?? "Other"
+        let catName = transaction.category?.name ?? "Other"
+        titleLabel.text = catName
         
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
@@ -84,14 +85,14 @@ class TransactionCell: UITableViewCell {
         
         if transaction.type == "income" {
             amountLabel.text = "+\(amountStr)"
-            amountLabel.textColor = Theme.incomeColor
+            amountLabel.textColor = .systemGreen
             iconContainer.backgroundColor = Theme.incomeColor
-            iconImageView.image = UIImage(systemName: "arrow.down.left")
+            iconImageView.image = UIImage(systemName: catName.iconForCategory())
         } else {
             amountLabel.text = "-\(amountStr)"
-            amountLabel.textColor = .label
+            amountLabel.textColor = .systemRed
             iconContainer.backgroundColor = transaction.category?.colorHex != nil ? UIColor(hex: transaction.category!.colorHex!) : Theme.accent
-            iconImageView.image = UIImage(systemName: "cart.fill")
+            iconImageView.image = UIImage(systemName: catName.iconForCategory())
         }
     }
 }

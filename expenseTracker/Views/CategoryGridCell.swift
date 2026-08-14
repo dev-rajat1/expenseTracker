@@ -63,7 +63,8 @@ class CategoryGridCell: UICollectionViewCell {
     }
     
     func configure(category: Category, amount: Double, color: UIColor) {
-        titleLabel.text = category.name ?? "Other"
+        let catName = category.name ?? "Other"
+        titleLabel.text = catName
         amountLabel.text = Theme.currencyFormatter.string(from: NSNumber(value: amount)) ?? "$0.00"
         
         DispatchQueue.main.async {
@@ -71,6 +72,6 @@ class CategoryGridCell: UICollectionViewCell {
             self.iconContainer.backgroundColor = UIColor(patternImage: gradientImage)
         }
         
-        iconImageView.image = UIImage(systemName: "tag.fill") // Can be dynamic later
+        iconImageView.image = UIImage(systemName: catName.iconForCategory())
     }
 }

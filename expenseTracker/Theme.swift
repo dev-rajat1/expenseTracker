@@ -77,3 +77,19 @@ extension UIImage {
     }
 }
 
+extension String {
+    func iconForCategory() -> String {
+        let lower = self.lowercased()
+        if lower.contains("food") || lower.contains("dine") || lower.contains("eat") { return "fork.knife" }
+        if lower.contains("travel") || lower.contains("transport") || lower.contains("cab") { return "car.fill" }
+        if lower.contains("shop") || lower.contains("clothes") { return "bag.fill" }
+        if lower.contains("health") || lower.contains("med") || lower.contains("doctor") { return "cross.case.fill" }
+        if lower.contains("gym") || lower.contains("fit") { return "dumbbell.fill" }
+        if lower.contains("bill") || lower.contains("util") { return "bolt.fill" }
+        if lower.contains("edu") || lower.contains("school") || lower.contains("study") { return "book.fill" }
+        if lower.contains("enter") || lower.contains("movie") || lower.contains("fun") { return "tv.fill" }
+        if lower.contains("grocer") { return "cart.fill" }
+        return "tag.fill"
+    }
+}
+

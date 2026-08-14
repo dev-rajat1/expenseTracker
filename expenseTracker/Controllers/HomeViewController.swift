@@ -114,15 +114,15 @@ class HomeViewController: UIViewController {
         // 5. Floating Action Button (FAB)
         fab.setImage(UIImage(systemName: "plus"), for: .normal)
         fab.tintColor = .white
-        fab.layer.cornerRadius = 28
+        fab.layer.cornerRadius = 20 // Squircle instead of perfect circle
         fab.clipsToBounds = true
         
         DispatchQueue.main.async {
-            let fabGradient = UIImage.gradientImage(bounds: self.fab.bounds, colors: [UIColor.systemPink, UIColor.systemOrange])
+            let fabGradient = UIImage.gradientImage(bounds: self.fab.bounds, colors: [UIColor.systemIndigo, UIColor.systemPurple])
             self.fab.setBackgroundImage(fabGradient, for: .normal)
         }
         
-        fab.layer.shadowColor = UIColor.systemPink.cgColor
+        fab.layer.shadowColor = UIColor.systemIndigo.cgColor
         fab.layer.shadowOpacity = 0.5
         fab.layer.shadowOffset = CGSize(width: 0, height: 6)
         fab.layer.shadowRadius = 12
