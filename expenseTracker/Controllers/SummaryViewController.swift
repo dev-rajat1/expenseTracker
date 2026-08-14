@@ -77,11 +77,11 @@ class SummaryViewController: UIViewController {
         
         // 3. Collection View
         let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
         layout.minimumLineSpacing = 16
         layout.minimumInteritemSpacing = 16
         layout.sectionInset = UIEdgeInsets(top: 8, left: 16, bottom: 16, right: 16)
-        let width = (view.bounds.width - 48) / 2
-        layout.itemSize = CGSize(width: width, height: width * 0.85)
+        layout.itemSize = CGSize(width: 140, height: 140)
         
         collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.delegate = self
@@ -123,7 +123,7 @@ class SummaryViewController: UIViewController {
             collectionView.topAnchor.constraint(equalTo: sectionHeaderLabel.bottomAnchor, constant: 8),
             collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            collectionView.heightAnchor.constraint(equalToConstant: 180)
         ])
     }
     
