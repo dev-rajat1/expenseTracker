@@ -8,6 +8,7 @@ class SummaryViewController: UIViewController {
     private let pieChartView = PieChartView()
     private let centerTotalLabel = UILabel()
     private let centerSubtitleLabel = UILabel()
+    private let selectedCategoryLabel = UILabel()
     
     private let sectionHeaderLabel = UILabel()
     private var collectionView: UICollectionView!
@@ -41,6 +42,7 @@ class SummaryViewController: UIViewController {
         cardTitleLabel.translatesAutoresizingMaskIntoConstraints = false
         chartCard.contentView.addSubview(cardTitleLabel)
         
+        pieChartView.delegate = self
         pieChartView.translatesAutoresizingMaskIntoConstraints = false
         chartCard.contentView.addSubview(pieChartView)
         
@@ -58,6 +60,13 @@ class SummaryViewController: UIViewController {
         centerSubtitleLabel.textAlignment = .center
         centerSubtitleLabel.translatesAutoresizingMaskIntoConstraints = false
         pieChartView.addSubview(centerSubtitleLabel)
+        
+        selectedCategoryLabel.text = "Tap a chart slice for details"
+        selectedCategoryLabel.font = .systemFont(ofSize: 14, weight: .medium)
+        selectedCategoryLabel.textColor = Theme.accent
+        selectedCategoryLabel.textAlignment = .center
+        selectedCategoryLabel.translatesAutoresizingMaskIntoConstraints = false
+        chartCard.contentView.addSubview(selectedCategoryLabel)
         
         // 2. Section Header
         sectionHeaderLabel.text = "Top Categories"
@@ -86,7 +95,7 @@ class SummaryViewController: UIViewController {
             chartCard.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
             chartCard.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             chartCard.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            chartCard.heightAnchor.constraint(equalToConstant: 280),
+            chartCard.heightAnchor.constraint(equalToConstant: 310),
             
             cardTitleLabel.topAnchor.constraint(equalTo: chartCard.contentView.topAnchor, constant: 16),
             cardTitleLabel.leadingAnchor.constraint(equalTo: chartCard.contentView.leadingAnchor, constant: 16),
@@ -102,6 +111,11 @@ class SummaryViewController: UIViewController {
             
             centerSubtitleLabel.centerXAnchor.constraint(equalTo: pieChartView.centerXAnchor),
             centerSubtitleLabel.topAnchor.constraint(equalTo: centerTotalLabel.bottomAnchor, constant: 2),
+            
+            selectedCategoryLabel.topAnchor.constraint(equalTo: pieChartView.bottomAnchor, constant: 16),
+            selectedCategoryLabel.centerXAnchor.constraint(equalTo: chartCard.contentView.centerXAnchor),
+            selectedCategoryLabel.leadingAnchor.constraint(equalTo: chartCard.contentView.leadingAnchor, constant: 16),
+            selectedCategoryLabel.trailingAnchor.constraint(equalTo: chartCard.contentView.trailingAnchor, constant: -16),
             
             sectionHeaderLabel.topAnchor.constraint(equalTo: chartCard.bottomAnchor, constant: 24),
             sectionHeaderLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
@@ -135,6 +149,8 @@ class SummaryViewController: UIViewController {
         }
         
         centerTotalLabel.text = Theme.currencyFormatter.string(from: NSNumber(value: totalExpense))
+        selectedCategoryLabel.text = "Tap a chart slice for details"
+        
         categoryTotals = totalsDict.map { (category: $0.key, total: $0.value) }.sorted(by: { $0.total > $1.total })
         
         var segments: [PieChartSegment] = []
@@ -171,5 +187,17 @@ extension SummaryViewController: UICollectionViewDelegate, UICollectionViewDataS
         let detailVC = CategoryDetailViewController()
         detailVC.category = selectedCat
         navigationController?.pushViewController(detailVC, animated: true)
+    }
+}
+
+extension SummaryViewController: PieChartViewDelegate {
+    func didSelectSegment(withTitle title: String) {
+        guard let item = categoryTotals.first(where: { $0.category.name == title }) else { return }
+        let amountStr = Theme.currencyFormatter.string(from: NSNumber(value: item.total)) ?? "$0.00"
+        let percentage = (item.total / totalExpense) * 100
+        
+        UIView.transition(with: selectedCategoryLabel, duration: 0.3, options: .transitionCrossDissolve, animations: {
+            self.selectedCategoryLabel.text = "\(title): \(amountStr) (\(String(format: "%.1f", percentage))%)"
+        }, completion: nil)
     }
 }
