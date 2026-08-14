@@ -4,6 +4,9 @@ import Vision
 
 class AddTransactionViewController: UIViewController {
 
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
+    
     private let typeSegment = UISegmentedControl(items: ["Expense", "Income"])
     private let amountField = UITextField()
     private let noteField = UITextField()
@@ -20,52 +23,91 @@ class AddTransactionViewController: UIViewController {
     
     private func setupUI() {
         view.backgroundColor = .systemBackground
-        title = "Add Transaction"
+        title = "New Transaction"
         
         let cancelBtn = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(didTapCancel))
-        let saveBtn = UIBarButtonItem(barButtonSystemItem: .save, target: self, action: #selector(didTapSave))
         cancelBtn.tintColor = .systemRed
-        saveBtn.tintColor = Theme.accent
-        
         navigationItem.leftBarButtonItem = cancelBtn
-        navigationItem.rightBarButtonItem = saveBtn
         
-        let glassView = GlassView()
-        glassView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(glassView)
+        // Setup ScrollView
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
         
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
+        ])
+        
+        // 1. Type Segment
         typeSegment.selectedSegmentIndex = 0
         typeSegment.backgroundColor = .secondarySystemGroupedBackground
         let segFont = UIFont.systemFont(ofSize: 15, weight: .bold)
         typeSegment.setTitleTextAttributes([.font: segFont, .foregroundColor: UIColor.secondaryLabel], for: .normal)
         typeSegment.setTitleTextAttributes([.font: segFont, .foregroundColor: UIColor.white], for: .selected)
-        
         let gradImage = UIImage.gradientImage(bounds: CGRect(x: 0, y: 0, width: 200, height: 50), colors: [UIColor.systemIndigo, UIColor.systemPurple])
         typeSegment.selectedSegmentTintColor = UIColor(patternImage: gradImage)
         
+        // 2. Amount Card
+        let amountCard = createCardView()
+        
+        let currencyLabel = UILabel()
+        currencyLabel.text = "$" // Could use Locale currency symbol
+        currencyLabel.font = .systemFont(ofSize: 40, weight: .bold)
+        currencyLabel.textColor = Theme.accent
+        
         amountField.placeholder = "0.00"
         amountField.keyboardType = .decimalPad
-        amountField.font = .systemFont(ofSize: 32, weight: .bold)
-        amountField.textAlignment = .center
-        
-        noteField.placeholder = "Add a note..."
-        noteField.borderStyle = .roundedRect
-        noteField.backgroundColor = .secondarySystemBackground
+        amountField.font = .systemFont(ofSize: 40, weight: .bold)
+        amountField.adjustsFontSizeToFitWidth = true
         
         let scanBtn = UIButton(type: .system)
         scanBtn.setImage(UIImage(systemName: "camera.viewfinder"), for: .normal)
-        scanBtn.setTitle(" Scan Receipt", for: .normal)
         scanBtn.tintColor = Theme.accent
         scanBtn.addTarget(self, action: #selector(didTapScan), for: .touchUpInside)
         
+        let amountStack = UIStackView(arrangedSubviews: [currencyLabel, amountField, scanBtn])
+        amountStack.axis = .horizontal
+        amountStack.spacing = 12
+        amountStack.translatesAutoresizingMaskIntoConstraints = false
+        amountCard.addSubview(amountStack)
+        
+        // 3. Note Card
+        let noteCard = createCardView()
+        let noteIcon = UIImageView(image: UIImage(systemName: "pencil.and.outline"))
+        noteIcon.tintColor = .secondaryLabel
+        noteIcon.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        
+        noteField.placeholder = "Add a note..."
+        noteField.borderStyle = .none
+        noteField.font = .systemFont(ofSize: 16)
+        
+        let noteStack = UIStackView(arrangedSubviews: [noteIcon, noteField])
+        noteStack.axis = .horizontal
+        noteStack.spacing = 12
+        noteStack.translatesAutoresizingMaskIntoConstraints = false
+        noteCard.addSubview(noteStack)
+        
+        // 4. Category Card
+        let categoryCard = createCardView()
         let catLabel = UILabel()
         catLabel.text = "Category"
-        catLabel.font = .systemFont(ofSize: 14, weight: .semibold)
-        catLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        catLabel.font = .systemFont(ofSize: 16, weight: .semibold)
         
         let newCatBtn = UIButton(type: .system)
         newCatBtn.setImage(UIImage(systemName: "plus.circle.fill"), for: .normal)
         newCatBtn.setTitle(" New", for: .normal)
+        newCatBtn.tintColor = Theme.accent
+        newCatBtn.titleLabel?.font = .systemFont(ofSize: 14, weight: .bold)
         newCatBtn.addTarget(self, action: #selector(didTapNewCategory), for: .touchUpInside)
         
         let catHeaderStack = UIStackView(arrangedSubviews: [catLabel, UIView(), newCatBtn])
@@ -74,47 +116,99 @@ class AddTransactionViewController: UIViewController {
         categoryPicker.delegate = self
         categoryPicker.dataSource = self
         
+        let catStack = UIStackView(arrangedSubviews: [catHeaderStack, categoryPicker])
+        catStack.axis = .vertical
+        catStack.spacing = 8
+        catStack.translatesAutoresizingMaskIntoConstraints = false
+        categoryCard.addSubview(catStack)
+        
+        // 5. Date Card
+        let dateCard = createCardView()
+        let dateLabel = UILabel()
+        dateLabel.text = "Date & Time"
+        dateLabel.font = .systemFont(ofSize: 16, weight: .semibold)
+        
         datePicker.datePickerMode = .dateAndTime
         datePicker.preferredDatePickerStyle = .compact
         
+        let dateStack = UIStackView(arrangedSubviews: [dateLabel, UIView(), datePicker])
+        dateStack.axis = .horizontal
+        dateStack.alignment = .center
+        dateStack.translatesAutoresizingMaskIntoConstraints = false
+        dateCard.addSubview(dateStack)
+        
+        // 6. Save Button
         let saveContainer = UIButton(type: .system)
         saveContainer.setTitle("Save Transaction", for: .normal)
         saveContainer.setTitleColor(.white, for: .normal)
         saveContainer.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
-        saveContainer.layer.cornerRadius = 14
+        saveContainer.layer.cornerRadius = 16
         saveContainer.clipsToBounds = true
         DispatchQueue.main.async {
             let btnGradient = UIImage.gradientImage(bounds: saveContainer.bounds, colors: [UIColor.systemIndigo, UIColor.systemPurple])
             saveContainer.setBackgroundImage(btnGradient, for: .normal)
         }
+        saveContainer.layer.shadowColor = UIColor.systemIndigo.cgColor
+        saveContainer.layer.shadowOpacity = 0.4
+        saveContainer.layer.shadowOffset = CGSize(width: 0, height: 6)
+        saveContainer.layer.shadowRadius = 12
+        saveContainer.layer.masksToBounds = false
         saveContainer.addTarget(self, action: #selector(didTapSave), for: .touchUpInside)
         
-        let vStack = UIStackView(arrangedSubviews: [typeSegment, amountField, noteField, scanBtn, catHeaderStack, categoryPicker, datePicker, saveContainer])
-        vStack.axis = .vertical
-        vStack.spacing = 16
-        vStack.translatesAutoresizingMaskIntoConstraints = false
-        glassView.contentView.addSubview(vStack)
+        // Main Stack View
+        let mainStack = UIStackView(arrangedSubviews: [typeSegment, amountCard, noteCard, categoryCard, dateCard, saveContainer])
+        mainStack.axis = .vertical
+        mainStack.spacing = 20
+        mainStack.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(mainStack)
         
         NSLayoutConstraint.activate([
+            mainStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
+            mainStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            mainStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            mainStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -40),
+            
             typeSegment.heightAnchor.constraint(equalToConstant: 44),
-            saveContainer.heightAnchor.constraint(equalToConstant: 50),
+            saveContainer.heightAnchor.constraint(equalToConstant: 56),
+            categoryPicker.heightAnchor.constraint(equalToConstant: 120),
+            scanBtn.widthAnchor.constraint(equalToConstant: 44),
             
-            glassView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            glassView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            glassView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-            glassView.bottomAnchor.constraint(equalTo: vStack.bottomAnchor, constant: 20),
+            amountStack.topAnchor.constraint(equalTo: amountCard.topAnchor, constant: 16),
+            amountStack.leadingAnchor.constraint(equalTo: amountCard.leadingAnchor, constant: 16),
+            amountStack.trailingAnchor.constraint(equalTo: amountCard.trailingAnchor, constant: -16),
+            amountStack.bottomAnchor.constraint(equalTo: amountCard.bottomAnchor, constant: -16),
             
-            vStack.topAnchor.constraint(equalTo: glassView.topAnchor, constant: 20),
-            vStack.leadingAnchor.constraint(equalTo: glassView.leadingAnchor, constant: 16),
-            vStack.trailingAnchor.constraint(equalTo: glassView.trailingAnchor, constant: -16),
+            noteStack.topAnchor.constraint(equalTo: noteCard.topAnchor, constant: 16),
+            noteStack.leadingAnchor.constraint(equalTo: noteCard.leadingAnchor, constant: 16),
+            noteStack.trailingAnchor.constraint(equalTo: noteCard.trailingAnchor, constant: -16),
+            noteStack.bottomAnchor.constraint(equalTo: noteCard.bottomAnchor, constant: -16),
             
-            categoryPicker.heightAnchor.constraint(equalToConstant: 100)
+            catStack.topAnchor.constraint(equalTo: categoryCard.topAnchor, constant: 16),
+            catStack.leadingAnchor.constraint(equalTo: categoryCard.leadingAnchor, constant: 16),
+            catStack.trailingAnchor.constraint(equalTo: categoryCard.trailingAnchor, constant: -16),
+            catStack.bottomAnchor.constraint(equalTo: categoryCard.bottomAnchor, constant: -8),
+            
+            dateStack.topAnchor.constraint(equalTo: dateCard.topAnchor, constant: 16),
+            dateStack.leadingAnchor.constraint(equalTo: dateCard.leadingAnchor, constant: 16),
+            dateStack.trailingAnchor.constraint(equalTo: dateCard.trailingAnchor, constant: -16),
+            dateStack.bottomAnchor.constraint(equalTo: dateCard.bottomAnchor, constant: -16)
         ])
         
-        // Tap to dismiss keyboard
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         tap.cancelsTouchesInView = false
         view.addGestureRecognizer(tap)
+    }
+    
+    private func createCardView() -> UIView {
+        let view = UIView()
+        view.backgroundColor = .secondarySystemGroupedBackground
+        view.layer.cornerRadius = 16
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOpacity = 0.05
+        view.layer.shadowOffset = CGSize(width: 0, height: 2)
+        view.layer.shadowRadius = 8
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
     }
     
     @objc private func dismissKeyboard() {
@@ -140,12 +234,11 @@ class AddTransactionViewController: UIViewController {
             let context = CoreDataManager.shared.context
             let cat = Category(context: context)
             cat.name = text
-            cat.colorHex = "#3498db" // Default color for custom
+            cat.colorHex = "#3498db" // Default color
             cat.budgetLimit = 0
             CoreDataManager.shared.saveContext()
             self?.fetchCategories()
             
-            // Select the newly added category
             if let index = self?.categories.firstIndex(of: cat) {
                 self?.categoryPicker.selectRow(index, inComponent: 0, animated: true)
             }
