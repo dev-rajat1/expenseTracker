@@ -37,6 +37,18 @@ class PieChartView: UIView {
         self.addGestureRecognizer(tap)
     }
     
+    private var previousBounds: CGRect = .zero
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        if bounds != previousBounds {
+            previousBounds = bounds
+            if !segments.isEmpty {
+                drawChart()
+            }
+        }
+    }
+    
     private func drawChart() {
         // Remove old layers
         shapeLayers.forEach { $0.removeFromSuperlayer() }
